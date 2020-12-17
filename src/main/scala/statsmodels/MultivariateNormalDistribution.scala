@@ -1,0 +1,5 @@
+package statsmodels
+
+class MultivariateNormalDistribution {
+
+}
