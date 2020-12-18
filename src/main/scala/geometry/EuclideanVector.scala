@@ -1,3 +1,8 @@
+/**
+ * Implementation of Euclidean vector space over N-dimensions.
+ * Modified from:
+ * https://github.com/unibas-gravis/scalismo/blob/master/src/main/scala/scalismo/geometry/EuclideanVector.scala
+ */
 package geometry
 
 import breeze.linalg.DenseVector
@@ -6,7 +11,12 @@ import spire.std.any.DoubleAlgebra
 
 import scala.language.implicitConversions
 
-
+/**
+ * Abstract class defining a Euclidean vector.
+ *
+ * @param NDSpace$D$0 NDSpace type.
+ * @tparam D trait giving dimension of the space.
+ */
 abstract class EuclideanVector[D: NDSpace] {
   def apply(i: Int): Double
 
@@ -48,6 +58,11 @@ abstract class EuclideanVector[D: NDSpace] {
 
 }
 
+/**
+ * Case class defining 1D euclidean vectors.
+ *
+ * @param x value of first dimension of euclidean vector.
+ */
 case class EuclideanVector1D(x: Double) extends EuclideanVector[_1D] {
   override def apply(i: Int): Double = i match {
     case 0 => x
@@ -71,6 +86,12 @@ case class EuclideanVector1D(x: Double) extends EuclideanVector[_1D] {
   override def mapWithIndex(f: (Double, Int) => Double): EuclideanVector1D = EuclideanVector1D(f(x, 0))
 }
 
+/**
+ * Case class implementing Euclidean vectors in two dimensions.
+ *
+ * @param x Value of first dimension of the vector.
+ * @param y Value of the second dimension of the vector.
+ */
 case class EuclideanVector2D(x: Double, y: Double) extends EuclideanVector[_2D] {
   override def apply(i: Int): Double = i match {
     case 0 => x
@@ -95,12 +116,18 @@ case class EuclideanVector2D(x: Double, y: Double) extends EuclideanVector[_2D] 
   override def mapWithIndex(f: (Double, Int) => Double): EuclideanVector2D = EuclideanVector2D(f(x, 0), f(y, 1))
 }
 
+/**
+ * Utility objects for one dimensional space.
+ */
 object EuclideanVector1D {
   val zero: EuclideanVector1D = EuclideanVector1D(0.0)
   val ones: EuclideanVector1D = EuclideanVector1D(1.0)
   val unitX: EuclideanVector1D = EuclideanVector1D(1.0)
 }
 
+/**
+ * Utility objects for two dimensional space.
+ */
 object EuclideanVector2D {
   val unitX: EuclideanVector2D = EuclideanVector2D(1.0, 0.0)
   val unitY: EuclideanVector2D = EuclideanVector2D(0.0, 1.0)
@@ -109,6 +136,9 @@ object EuclideanVector2D {
   val ones: EuclideanVector2D = EuclideanVector2D(1.0, 1.0)
 }
 
+/**
+ * Constructors from vectors
+ */
 object EuclideanVector {
 
   def apply(x: Double): EuclideanVector[_1D] = EuclideanVector1D(x)
@@ -168,6 +198,7 @@ object EuclideanVector {
       x.mapWithIndex((f, i) => f + y(i))
   }
 
+  /** Implicits. */
   implicit def parametricToConcrete1D(p: EuclideanVector[_1D]): EuclideanVector1D = p.asInstanceOf[EuclideanVector1D]
 
   implicit def parametricToConcrete2D(p: EuclideanVector[_2D]): EuclideanVector2D = p.asInstanceOf[EuclideanVector2D]

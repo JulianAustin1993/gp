@@ -1,5 +1,6 @@
 package geometry
 
+import geometry.Domain.{intersection, union}
 import org.scalatest.FunSuite
 
 class DomainTest extends FunSuite {
@@ -32,5 +33,20 @@ class DomainTest extends FunSuite {
     assertThrows[IllegalArgumentException] {
       val domain = BoxDomain[_2D](EuclideanVector(0.0, 0.0), EuclideanVector(-5.0, -4.0))
     }
+  }
+
+  test("Domain union") {
+    val d1 = BoxDomain1D(EuclideanVector(0.0), EuclideanVector(5.0))
+    val d2 = BoxDomain1D(EuclideanVector(6.0), EuclideanVector(7.0))
+    val d3 = union(d1, d2)
+    assert(d3.isDefinedAt(EuclideanVector(4.5)) && d3.isDefinedAt(EuclideanVector(6.5)))
+  }
+
+  test("Domain intersection") {
+    val d1 = BoxDomain1D(EuclideanVector(0.0), EuclideanVector(5.0))
+    val d2 = BoxDomain1D(EuclideanVector(4.0), EuclideanVector(7.0))
+    val d3 = intersection(d1, d2)
+    assert(d3.isDefinedAt(EuclideanVector(4.5)))
+    assert(!d3.isDefinedAt(EuclideanVector(6.0)))
   }
 }

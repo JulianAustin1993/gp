@@ -1,25 +1,74 @@
+/**
+ * Domain classes and objects defining a domain implementation for models.
+ * Modified from:
+ * https://github.com/unibas-gravis/scalismo/blob/master/src/main/scala/scalismo/common/Domain.scala
+ */
 package geometry
 
+/**
+ * Domain trait, giving a domain with a check if a vector is in the domain.
+ *
+ * @tparam D Dimension of the space holding the domain.
+ */
 trait Domain[D] {
   def isDefinedAt(v: EuclideanVector[D]): Boolean
 }
 
+/**
+ * Domain objects
+ */
 object Domain {
+  /**
+   * Create a domain from a predicate.
+   *
+   * @param chi predicate function defining which vectors are in the domain.
+   * @tparam D Dimension of the domain
+   * @return Domain where vectors are defined at chi(v)==True
+   */
   def fromPredicate[D](chi: EuclideanVector[D] => Boolean): Domain[D] = (v: EuclideanVector[D]) => chi(v)
 
+  /**
+   * Intersection of domains
+   *
+   * @param thisDomain First domain
+   * @param thatDomain Second domain
+   * @tparam D dimension of the space
+   * @return Domain which is the intersection between the two domains.
+   */
   def intersection[D](thisDomain: Domain[D], thatDomain: Domain[D]): Domain[D] = (v: EuclideanVector[D]) => thisDomain.isDefinedAt(v) && thatDomain.isDefinedAt(v)
 
+  /**
+   * Union of domains.
+   *
+   * @param thisDomain First domain
+   * @param thatDomain Second domain
+   * @tparam D dimension of the space
+   * @return Domain which is the union of the two domains.
+   */
   def union[D](thisDomain: Domain[D], thatDomain: Domain[D]): Domain[D] = (v: EuclideanVector[D]) => thisDomain.isDefinedAt(v) || thatDomain.isDefinedAt(v)
 }
 
+/**
+ * Real space domain implementation. Vectors are defined everywhere.
+ *
+ * @tparam D Dimension of the space holding the domain.
+ */
 class RealSpace[D] extends Domain[D] {
   override def isDefinedAt(v: EuclideanVector[D]): Boolean = true
 }
 
+/**
+ * Companion object for RealSpace class.
+ */
 object RealSpace {
   def apply[D] = new RealSpace[D]
 }
 
+/**
+ * Define a domain which is a box over the space.
+ *
+ * @tparam D Dimension of the space holding the domain.
+ */
 trait BoxDomain[D] extends Domain[D] {
   val origin: EuclideanVector[D]
   val oppositeCorner: EuclideanVector[D]
@@ -33,6 +82,12 @@ trait BoxDomain[D] extends Domain[D] {
   }
 }
 
+/**
+ * Case class of box domain in 1-dimension
+ *
+ * @param origin         lower left hand corner of domain.
+ * @param oppositeCorner upper right hand corner of domain.
+ */
 case class BoxDomain1D(origin: EuclideanVector1D, oppositeCorner: EuclideanVector1D) extends BoxDomain[_1D] {
   require(origin.x <= oppositeCorner.x, "Origin must be smaller than oppositeCorner")
 
@@ -42,6 +97,12 @@ case class BoxDomain1D(origin: EuclideanVector1D, oppositeCorner: EuclideanVecto
   }
 }
 
+/**
+ * Case class of box domain in 2-dimensions.
+ *
+ * @param origin         lower left hand corner of domain.
+ * @param oppositeCorner upper right hand corner of doomain.
+ */
 case class BoxDomain2D(origin: EuclideanVector2D, oppositeCorner: EuclideanVector2D) extends BoxDomain[_2D] {
   require(origin.x <= oppositeCorner.x && origin.y <= oppositeCorner.y, "Origin must be the lower left corner")
 
@@ -51,6 +112,9 @@ case class BoxDomain2D(origin: EuclideanVector2D, oppositeCorner: EuclideanVecto
   }
 }
 
+/**
+ * Box domain apply methods.
+ */
 object BoxDomain {
   def apply(origin: EuclideanVector1D, oppositeCorner: EuclideanVector1D): BoxDomain1D = BoxDomain1D(origin, oppositeCorner)
 
